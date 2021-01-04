@@ -9,8 +9,8 @@ query-db-by-email
 1.1功能说明<br>
 >系统入口，创建多个线程并发处理各自任务。<br>
 1.2请求参数<br>
->-v
->说明：设定日志数据级别为DEBUG<br>
+>>-v
+>>说明：设定日志数据级别为DEBUG<br>
 1.3同步流程<br>
 >>流程图说明：<br>
 >>![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/start.png)<br>
