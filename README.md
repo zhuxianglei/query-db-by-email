@@ -1,8 +1,12 @@
 # query-db-by-email
+邮件查询数据库功能说明
+===================
+
 用户通过email附件的形式发送数据库查询SQL,系统接收并分析邮件，然后调用数据库的导出脚本，导出数据存储在数据库服务器，系统登录服务器处理数据文件，下载到本地，然后通过email把查询结果发送给用户。
 
-系统功能说明如下
-1.	启动(start.py)
+
+1.	启动(start.py)<br>
+--------------------------
 1.1功能说明
 系统入口，创建多个线程并发处理各自任务。
 1.2请求参数
@@ -10,7 +14,7 @@
 说明：设定日志数据级别为DEBUG
 1.3同步流程
 流程图说明：
-![image] https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/start.png
+![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/start.png)
 1.4处理流程
 1.初始化部分：读取系统ini配置文件，设定日志级别，初始化各种目录（下载，日志，历史，发送），刷新db&os配置参数
 2.创建邮件数据分析线程：此线程负责读取邮件，下载附件，获取系统运行需要的mailmeta元数据
@@ -18,7 +22,8 @@
 4.创建文件分析发送线程：此线程负责已下载的导出数据的邮件发送，清理历史数据
 5.最后一块逻辑是循环创建从数据库导出数据的线程，由于此线程是瓶颈，需要创建多个，每个线程处理完自己的事务就退出，如果设定时间没有退出（30Min）,将被系统杀死，然后按照设定参数循环创建新线程。
 
-2.	邮件数据分析(mailsa.py)
+2.	邮件数据分析(mailsa.py)<br>
+--------------------------
 2.1功能说明
 按照start.ini的配置参数登录邮件服务器，读取设定目录邮件，获取关键数据，下载附件
 2.2请求参数
@@ -29,7 +34,7 @@ pparaslst:数据库用户名&密码&端口Servername(用于连接数据库执行
 pmutex:线程锁,用于保护pmailslst，防止出现多线程操作时的数据安全问题
 2.3同步流程
 流程图说明：
-![image] https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/mailsa.png
+![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/mailsa.png)
 2.4处理流程
 1.判断是否系统休息时间，是则退出
 2.按照start.ini配置参数登录邮件服务器
@@ -43,7 +48,8 @@ pmutex:线程锁,用于保护pmailslst，防止出现多线程操作时的数据
 10.如果所有邮件处理结束，设定邮件处理标示为OK,此标识将触发附件分析处理线程开始运行
 11.开始下一次循环，即从步骤1开始
 
-3.	附件分析处理(s2file.py)
+3.	附件分析处理(s2file.py)<br>
+--------------------------
 3.1功能说明
 按照start.ini配置参数从设定目录读取从邮件下载的文件，处理文件成固定格式，调用sqlplus执行批处理创建view,然后通过cx_oracle连接数据库，调用数据导出存储过程
 3.2请求参数
@@ -58,7 +64,7 @@ pmutexp:线程锁，用于保护pproclst& pdbconlst数据在多线程下的安�
 pdbconlst:数据库连接列表，主要用于存储各个线程cx_oracle模块发起的数据库连接信息
 3.3同步流程
 流程图说明：
-![image] https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/s2file.png
+![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/s2file.png)
 3.4处理流程
 1.	判断是否系统休息时间，是则退出
 2.	判断邮件处理是否OK
@@ -77,7 +83,8 @@ pdbconlst:数据库连接列表，主要用于存储各个线程cx_oracle模块�
 15.	设定附件分析处理OK,次标识将触发导出数据处理线程
 16.	继续下一次循环，跳到1处
 
-4.	导出数据处理(filepg.py)
+4.	导出数据处理(filepg.py)<br>
+--------------------------
 4.1功能说明
 安照邮件列表中附件处理OK的元数据和配置参数，登录设定服务器，执行压缩，分割，下载导出文件
 4.2请求参数
@@ -89,7 +96,7 @@ pmutex:参见邮件数据分析说明
 
 4.3同步流程
 流程图说明：
-![image] https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/filepg.png
+![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/filepg.png)
 4.4处理流程
 1.判断是否系统休息时间，是则退出
 2.判断附件处理是否OK
@@ -103,7 +110,8 @@ pmutex:参见邮件数据分析说明
 10.设置导出数据处理为OK,此标识将触发文件分析发送线程
 11.继续下一次循环，跳到1处
 
-5.	文件分析发送(mailss.py)
+5.	文件分析发送(mailss.py)<br>
+--------------------------
 5.1功能说明
 读取已下载待发送附件文件夹，根据邮件列表中标识为已下载的元数据，结合配置参数，登录邮件服务器，上载附件文件，发送邮件。
 5.2请求参数
@@ -114,7 +122,7 @@ pmutex:参见邮件数据分析说明
 pdirattachment:要发送的附件所在目录
 5.3同步流程
 流程图说明：
-![image] https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/mailss.png
+![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/mailss.png)
 5.4处理流程
 1.判断是否系统休息时间，是则退出
 2.判断导出数据处理是否OK
@@ -125,7 +133,8 @@ pdirattachment:要发送的附件所在目录
 7.删除邮件列表中已经发送的uid元数据，如果还有文件待处理，循环，跳到3
 8.处理异常邮件列表（主要是超时邮件，包括执行数据导出但超过设定时间未结束，或已经标识为已下载但长时间（最大设定时间*4）未发送未删除），这些邮件将被标识未错误，发送错误信息后删除。
 
-6.	配置文件
+6.	配置文件<br>
+--------------------------
 6.1	start.ini
 系统运行相关配置，实时刷新，更改立即生效，说明如下：
 
@@ -171,5 +180,5 @@ TNS：系统运行主机上TNSNAME.ORA文件的配置名，注意当前系统使
 dbusr&dbpwd&1522&servername(端口):登录数据库用户名&密码&端口&服务名；s2file模块的sqlplus&cx_oracle使用
 ospusr&ospwd&22(端口):ssh&sftp登录os使用的用户名&密码&端口,filepg模块使用
 TNSDESCRIPTION:TNS描述，主要用于邮件正文database:关键字，用于区分数据库
-![image] https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/params.png
+![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/params.png)<br>
 created by xlzhu@ips.com at Shanghai 2018.12.04
