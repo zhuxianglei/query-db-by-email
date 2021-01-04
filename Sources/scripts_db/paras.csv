@@ -1,0 +1,6 @@
+TNS,dbusr,dbpwd,osusr,ospwd,IP,port_ssh,port_db,SERVERNAME,TNSDESCRIPTION
+ORA_TNS_NAME,db_user,db_pwd,os_account,os_pwd,os_ip,22,1521,db_service_name,desc_db_used_by_email
+ORA_TNS_NAME,db_user,db_pwd,os_account,os_pwd,os_ip,22,1521,db_service_name,desc_db_used_by_email
+ORA_TNS_NAME,db_user,db_pwd,os_account,os_pwd,os_ip,22,1521,db_service_name,desc_db_used_by_email
+MYSQL_FLAG_UNI,db_user,db_pwd,os_account,os_pwd,os_ip,22,3306,db_objects_exporttable,desc_db_used_by_email
+MYSQL_FLAG_UNI,db_user,db_pwd,os_account,os_pwd,os_ip,22,3306,db_objects_exporttable,desc_db_used_by_email
