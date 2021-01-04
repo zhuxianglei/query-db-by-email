@@ -1,5 +1,4 @@
-# query-db-by-email
-邮件查询数据库功能说明
+query-db-by-email
 ===================
 
 用户通过email附件的形式发送数据库查询SQL,系统接收并分析邮件，然后调用数据库的导出脚本，导出数据存储在数据库服务器，系统登录服务器处理数据文件，下载到本地，然后通过email把查询结果发送给用户。
@@ -7,12 +6,12 @@
 
 1.	启动(start.py)<br>
 --------------------------
-1.1功能说明
+1.1功能说明<br>
 系统入口，创建多个线程并发处理各自任务。
-1.2请求参数
+1.2请求参数<br>
 -v
 说明：设定日志数据级别为DEBUG
-1.3同步流程
+1.3同步流程<br>
 流程图说明：
 ![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/start.png)
 1.4处理流程
@@ -24,18 +23,18 @@
 
 2.	邮件数据分析(mailsa.py)<br>
 --------------------------
-2.1功能说明
+2.1功能说明<br>
 按照start.ini的配置参数登录邮件服务器，读取设定目录邮件，获取关键数据，下载附件
-2.2请求参数
+2.2请求参数<br>
 pmailslst,pparaslst,pmutex
 说明：
 pmailslst:邮件列表,存储从邮件中获取的元数据（收件人，发件人,抄送人，主题，关键词对应的tns），各线程共享
 pparaslst:数据库用户名&密码&端口Servername(用于连接数据库执行数据导出)，OS IP&用户名&密码&端口（连接OS执行压缩下载等任务），TNS相关信息（用于sqlplus批处理）；密码加密存储
 pmutex:线程锁,用于保护pmailslst，防止出现多线程操作时的数据安全问题
-2.3同步流程
+2.3同步流程<br>
 流程图说明：
 ![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/mailsa.png)
-2.4处理流程
+2.4处理流程<br>
 1.判断是否系统休息时间，是则退出
 2.按照start.ini配置参数登录邮件服务器
 3.获取邮件的唯一性标识UID,此UID也是邮件列表中元数据的唯一标识
@@ -50,9 +49,9 @@ pmutex:线程锁,用于保护pmailslst，防止出现多线程操作时的数据
 
 3.	附件分析处理(s2file.py)<br>
 --------------------------
-3.1功能说明
+3.1功能说明<br>
 按照start.ini配置参数从设定目录读取从邮件下载的文件，处理文件成固定格式，调用sqlplus执行批处理创建view,然后通过cx_oracle连接数据库，调用数据导出存储过程
-3.2请求参数
+3.2请求参数<br>
 pmailslst,pparaslst,pmutex,pdb,pproclst,pmutexp,pdbconlst
 说明：
 pmailslst:参见邮件数据分析说明
@@ -62,10 +61,10 @@ pdb:tns标识，此标识限定了当前线程能处理的文件前缀，能登�
 pproclst:进程列表，主要用于存储sqlplus信息，已废弃
 pmutexp:线程锁，用于保护pproclst& pdbconlst数据在多线程下的安全
 pdbconlst:数据库连接列表，主要用于存储各个线程cx_oracle模块发起的数据库连接信息
-3.3同步流程
+3.3同步流程<br>
 流程图说明：
 ![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/s2file.png)
-3.4处理流程
+3.4处理流程<br>
 1.	判断是否系统休息时间，是则退出
 2.	判断邮件处理是否OK
 3.	按照设定目录读取从邮件下载的附件，
@@ -85,7 +84,7 @@ pdbconlst:数据库连接列表，主要用于存储各个线程cx_oracle模块�
 
 4.	导出数据处理(filepg.py)<br>
 --------------------------
-4.1功能说明
+4.1功能说明<br>
 安照邮件列表中附件处理OK的元数据和配置参数，登录设定服务器，执行压缩，分割，下载导出文件
 4.2请求参数
 pmailslst,pparaslst,pmutex
@@ -94,10 +93,10 @@ pmailslst:参见邮件数据分析说明
 pparaslst:参见邮件数据分析说明
 pmutex:参见邮件数据分析说明
 
-4.3同步流程
+4.3同步流程<br>
 流程图说明：
 ![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/filepg.png)
-4.4处理流程
+4.4处理流程<br>
 1.判断是否系统休息时间，是则退出
 2.判断附件处理是否OK
 3.读取邮件列表中附件处理OK的服务器(TNS)列表，获取IP&用户&密码&端口
@@ -112,18 +111,18 @@ pmutex:参见邮件数据分析说明
 
 5.	文件分析发送(mailss.py)<br>
 --------------------------
-5.1功能说明
+5.1功能说明<br>
 读取已下载待发送附件文件夹，根据邮件列表中标识为已下载的元数据，结合配置参数，登录邮件服务器，上载附件文件，发送邮件。
-5.2请求参数
+5.2请求参数<br>
 pmaillst,pmutex,pdirattachment
 说明：
 pmaillst:参见邮件数据分析说明
 pmutex:参见邮件数据分析说明
 pdirattachment:要发送的附件所在目录
-5.3同步流程
+5.3同步流程<br>
 流程图说明：
 ![image](https://github.com/zhuxianglei/query-db-by-email/blob/master/Image/mailss.png)
-5.4处理流程
+5.4处理流程<br>
 1.判断是否系统休息时间，是则退出
 2.判断导出数据处理是否OK
 3.循环读取已下载待发送的文件夹
@@ -135,17 +134,17 @@ pdirattachment:要发送的附件所在目录
 
 6.	配置文件<br>
 --------------------------
-6.1	start.ini
-系统运行相关配置，实时刷新，更改立即生效，说明如下：
+6.1	start.ini<br>
+系统运行相关配置，实时刷新，更改立即生效，说明如下：<br>
 
-系统运行参数
+系统运行参数<br>
 [run]
 stoptime = 3,4,5,6  #系统休息时间(HH24格式)，逗号隔开，在此设定时间系统自动停止运行且无法开启,如果需要正常停止系统，请增加当前时间到此参数，系统处理完当前事务后自动终止
 port=64443       #系统开启时占用端口，主要用于防止系统重复运行
 maxthread=3      #瓶颈线程s2file.py最大线程数量
 sleep=60         #每一个周期结束后，系统休息时间，此参数决定了系统运行速度，按IPS目前的邮件量此设置不应该低于60，如果系统繁忙，可适当设小
 
-邮件相关参数
+邮件相关参数<br>
 [mail]
 user = Yourname@email.com        #登录邮件系统的用户名
 pwd =                     #登录邮件系统的明文密码，变更密码时填写此值，系统会自动加密存储于enpwd,并清空此值
@@ -154,18 +153,18 @@ cycle = 600                 #重新登录邮件系统的周期（秒）
 fromallow = xianglei.zhu@hotmail.com,name2@emai.com    #发件人许可
 maxqtime = 1800            #每封邮件允许的最大查询运行时间，超时s2file线程将被终止，系统回复超时邮件
 	
-imap邮件协议参数，mailsa模块使用
+imap邮件协议参数，mailsa模块使用<br>
 [imap]
 workdir = IPSAutoQuery       #当前系统的工作目录
 port = 993                  #协议端口号
 host = imap.xxxx.com     #协议host
 
-smtp邮件协议参数，mailss模块使用
+smtp邮件协议参数，mailss模块使用<br>
 [smtp]
 port = 994                 #协议端口号
 host = smtp.xxxx.com    #协议host
 
-系统目录参数 
+系统目录参数 <br>
 [dir]
 downloaded = D:\AutoQuery\downloaded  #邮件附件下载存放目录，mailsa,s2file使用
 willsend = D:\AutoQuery\willsend        #邮件发送附件目录，filepg,mailss使用
@@ -173,8 +172,8 @@ uploaded = D:\AutoQuery\uploaded      #需要上传的文件目录，已废弃
 history = D:\AutoQuery\his             #历史目录，来源于downloaded,willsend
 log = D:\AutoQuery\log                #系统日志目录，每天一个日志
 
-6.2	paras.csv
-database&os相关配置参数，主要是s2file,filepg模块使用，启动时刷新，为数据安全性考虑，刷新后此文件将被删除，后续使用paras.bin二进制加密文件替代，如果要更新参数，请按照下文格式与顺序修改此文件，放置于源代码目录即可，栏位说明如下：
+6.2	paras.csv<br>
+database&os相关配置参数，主要是s2file,filepg模块使用，启动时刷新，为数据安全性考虑，刷新后此文件将被删除，后续使用paras.bin二进制加密文件替代，如果要更新参数，请按照下文格式与顺序修改此文件，放置于源代码目录即可，栏位说明如下：<br>
 
 TNS：系统运行主机上TNSNAME.ORA文件的配置名，注意当前系统使用Oracle 11g client
 dbusr&dbpwd&1522&servername(端口):登录数据库用户名&密码&端口&服务名；s2file模块的sqlplus&cx_oracle使用
